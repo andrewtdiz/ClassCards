@@ -2,7 +2,7 @@
   <transition name="size-up">
     <div
       v-if="modalDelay"
-      class="bg-gray-100 z-20 rounded flex flex-col relative p-5"
+      class="bg-white z-20 rounded flex flex-col relative p-5"
       style="width: 650px"
     >
       <transition name="fade">
@@ -80,14 +80,14 @@
         <button
           type="button"
           @click="$store.commit('changeModal', '')"
-          class="w-full ml-auto inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+          class="w-full ml-auto transition-all duration-100 inline-flex justify-center rounded-md shadow-sm px-4 py-2 text-base font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
         >
           Cancel
         </button>
         <button
           type="button"
           @click="addDeck"
-          class="w-full relative inline-flex justify-center rounded-md border border-brand-blue-500 shadow-sm px-4 py-2 bg-brand-blue-500 text-base font-medium text-white hover:bg-brand-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
+          class="w-full relative transition-all duration-100 inline-flex justify-center rounded-md shadow-sm px-4 py-2 bg-brand-blue-500 text-base font-medium text-white hover:bg-brand-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
         >
           <p :class="creatingDeck ? 'opacity-0' : ''">Create Deck</p>
           <div

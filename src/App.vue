@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="tw-bg-gray-300" style="overflow-y:hidden; min-height: 100vh;" >
+  <div id="app" class="tw-bg-gray-300" style="overflow-x:hidden; min-height: 100vh;" >
     <router-view/>
     
   </div>

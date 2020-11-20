@@ -1,7 +1,7 @@
 <template>
   <div class="flex w-screen h-screen">
-      <ModalViewer />
-    <div class="w-56 bg-gray-100 flex flex-col">
+    <ModalViewer />
+    <div class="min-w-56 bg-gray-100 flex flex-col">
       <div class="media flex items-center hover:bg-gray-200 cursor-pointer p-2">
         <div class="media-left">
           <figure class="image is-32x32">
@@ -62,13 +62,82 @@
       </div>
 
       <div
-        class="flex mt-2 rounded transition-all hover:text-gray-900 text-gray-600 duration-100 "
+        class="flex mt-2 rounded transition-all hover:text-gray-900 text-gray-600 duration-100"
       >
-        <button @click="$store.commit('changeModal', 'createDeck')"
-          class="py-1  pl-2 pr-2 rounded text-xs font-medium"
+        <button
+          @click="$store.commit('changeModal', 'createDeck')"
+          class="py-1 pl-2 pr-2 rounded text-xs font-medium"
         >
           + Create New Deck
         </button>
+      </div>
+    </div>
+    <div class="bg-white flex-1 pt-20 px-20 flex flex-col">
+      <div
+        class="w-full flex items-center justify-between"
+        style="min-width: 800px"
+      >
+        <h1 class="text-4xl text-gray-900 font-bold">{{ currentDeck.name }}</h1>
+        <div class="flex">
+          <DefaultButton
+            :type="'brand'"
+            :label="'Study'"
+            @clicked="addUser"
+            class="mr-4"
+          />
+          <DefaultButton
+            :type="'default'"
+            :label="'+ Add Card'"
+            @clicked="addCard"
+            class="mr-4"
+          />
+          <button
+            @click="dropDown = !dropDown"
+            :class="
+              dropDown ? 'bg-gray-200' : ['hover:bg-gray-100', 'bg-gray-100']
+            "
+            class="w-full relative font-bold ml-auto shadow-sm transition-all duration-100 inline-flex justify-center rounded-md px-4 py-2 text-base focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+          >
+            ⋮
+            <transition name="fade-in">
+              <div
+                v-if="dropDown"
+                v-on-clickaway="clickAwayDrop"
+                class="flex flex-col py-2 w-56 bg-white rounded shadow-outline absolute right-0"
+                style="top: 110%"
+              >
+                <div
+                  v-for="(thing, ind) in [
+                    {
+                        image: 'fas fa-user-plus',
+                        name: 'Invite People',
+                        modal: 'addUser',
+                    },
+                    {
+                        image: 'fas fa-cog',
+                        name: 'Settings',
+                    },
+                    {
+                        image: 'fas fa-sign-out-alt',
+                        name: 'Leave Deck',
+                        modal: 'leaveDeck'
+                    },
+                  ]"
+                  :key="ind"
+                  class="py-1 flex items-center hover:bg-gray-100"
+                  @click="updateModal(thing.modal)"
+                >
+                  <div
+                    class="w-12 flex items-center justify-center h-full"
+                  >
+                    <i :class="thing.image"></i>
+                  </div>
+                  <p class="font-normal text-base text-gray-800">{{ thing.name }}</p>
+                </div>
+              </div>
+            </transition>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -76,12 +145,16 @@
 
 <script>
 import SidebarButton from "../components/Sidebar/SidebarButton";
+import DefaultButton from "../components/Buttons/DefaultButton";
 import ModalViewer from "../components/ModalViewer";
+import { mixin as clickaway } from "vue-clickaway";
 
 export default {
+  mixins: [clickaway],
   components: {
     SidebarButton,
-    ModalViewer
+    ModalViewer,
+    DefaultButton,
   },
   data() {
     return {
@@ -91,10 +164,24 @@ export default {
         Study: "/study",
       },
       loaded: false,
+      dropDown: false,
     };
   },
   methods: {
+    updateModal(thing) {
+      console.log('here i am', thing)
+      this.$store.commit('changeModal', thing)
+    },
+    addCard(thing) {
+      this.$store.commit('changeModal', 'addCard')
+    },
     goToConsole() {},
+    addUser() {
+      console.log("here ia m");
+    },
+    clickAwayDrop() {
+      if (this.dropDown) this.dropDown = false;
+    },
   },
   created() {
     setTimeout(() => {
@@ -136,4 +223,12 @@ export default {
 </script>
 
 <style>
+.fade-in-enter-active {
+  transition: opacity 0.5s;
+  transition: transform 0.2s;
+}
+.fade-in-enter /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+  transform: translateY(-10px);
+}
 </style>

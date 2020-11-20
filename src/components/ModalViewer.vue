@@ -4,8 +4,10 @@
       v-if="viewingModal !== ''"
       class="absolute z-10 w-screen h-screen flex flex-col items-center duration-100 transition-all justify-center"
     >
-      <CreateDeckModal :modalDelay="modalDelay" />
-
+      <CreateDeckModal v-if="viewingModal == 'createDeck'" :modalDelay="modalDelay" />
+      <AddUserModal v-if="viewingModal == 'addUser'"  :modalDelay="modalDelay" />
+      <AddCardModal v-if="viewingModal == 'addCard'" :modalDelay="modalDelay" />
+      <LeaveDeckModal v-if="viewingModal == 'leaveDeck'" :modalDelay="modalDelay" />
       <div
         @click="$store.commit('changeModal', '')"
         class="absolute w-full h-full bg-black bg-opacity-50 blur"
@@ -16,10 +18,16 @@
 
 <script>
 import CreateDeckModal from './Modals/CreateDeckModal'
+import AddUserModal from './Modals/AddUserModal'
+import AddCardModal from './Modals/AddCardModal'
+import LeaveDeckModal from './Modals/LeaveDeckModal'
 
 export default {
     components: {
-        CreateDeckModal
+        CreateDeckModal,
+        AddUserModal,
+        AddCardModal,
+        LeaveDeckModal
     },
   watch: {
     viewingModal() {
