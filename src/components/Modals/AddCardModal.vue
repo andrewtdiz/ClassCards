@@ -2,17 +2,23 @@
   <transition name="size-up">
     <div
       v-if="modalDelay"
-      class="bg-white z-20 rounded flex flex-col relative relative p-5"
-      style="width: 650px; min-height: 300px"
+      class="bg-white z-20 rounded flex flex-col relative p-5"
+      style="width: 650px; min-height: 280px"
     >
       <p class="uppercase text-xs">Content</p>
       <div class="relative w-full">
         <textarea
           type="text"
+          id="text"
           class="text-3xl w-full border-gray-200 hover:border-gray-400 focus:border-blue-500 flex-1 border rounded px-2 py-1"
           ref="card"
+          :input="cardContentDisplay"
+          @input="cardContent = $event.target.value"
         />
-        <div class="text-3xl text-white bg-blue-500 mx-2 my-1 absolute top-0 left-0">Here I am</div>
+        <h1
+          class="text-3xl pointer-events-none text-transparent mx-2 my-1 absolute top-0 left-0"
+          v-html="cardContent"
+        ></h1>
       </div>
 
       <p class="uppercase text-xs mt-2">Tags</p>
@@ -21,6 +27,12 @@
         class="text-base border-gray-200 hover:border-gray-400 focus:border-blue-500 border rounded px-2 py-1"
       />
       <div class="flex w-full justify-end mt-4">
+        <DefaultButton
+          :type="'default-2'"
+          @clicked="addCloze"
+          :label="'Cloze'"
+          class="mr-4"
+        />
         <DefaultButton
           :type="'default-2'"
           @clicked="$store.commit('changeModal', '')"
@@ -41,10 +53,18 @@ export default {
   components: {
     DefaultButton,
   },
+  data() {
+    return {
+      flipCol: false,
+      cardContent: '',
+      cardContentDisplay: '',
+    }
+  },
   computed: {
     currentDeck() {
       return this.$store.getters.getCurrentDeck;
     },
+    
   },
   watch: {
     modalDelay() {
@@ -55,14 +75,20 @@ export default {
       }
     },
   },
-  data() {
-    return {
-      flipCol: false,
-    };
-  },
   methods: {
     doThing(thing) {
-      console.log(thing);
+      if(thing.data==null) return 
+      this.cardContent += thing.data
+    },
+    addCloze() {
+      let text = document.getElementById("text");
+      console.log(text)
+      let ind = text.selectionStart
+      console.log(ind)
+      console.log('here ia m', this.cardContent, this.cardContent.indexOf('<span')==-1)
+      this.cardContent = this.cardContent.slice(0,ind) + '<span class="text-white bg-blue-500" style="padding: 1px">' + this.cardContent.slice(ind,text.selectionEnd) + '</span>'
+      this.cardContentDisplay = this.cardContent.replace('<span class="text-white bg-blue-500">','')
+      this.cardContentDisplay = this.cardContentDisplay.replace('</span>','')
     },
   },
 };

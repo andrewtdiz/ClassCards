@@ -1,5 +1,5 @@
-const getDeckByID = `query deck($id: String) {
-    deck(id: $id){
+const getDeckByID = `query deck($id: String, $userId: String) {
+    deck(id: $id, userId: $userId){
         name
         id
         deckDescription

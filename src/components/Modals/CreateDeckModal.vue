@@ -23,32 +23,29 @@
       <input
         placeholder="Deck Name"
         v-model="deckName"
-        class="hover:border-gray-30 focus:bg-white bg-transparent px-2 transition-all duration-200 focus:border-brand-blue-500 rounded border-transparent border text-4xl appearance-none font-bold text-gray-800"
+        class="hover:border-gray-300 focus:bg-white bg-transparent px-2 transition-all duration-200 focus:border-brand-blue-500 rounded border-transparent border text-4xl appearance-none font-bold text-gray-800"
       />
       <input
         placeholder="Description..."
         v-model="deckDescription"
-        class="hover:border-gray-30 focus:bg-white bg-transparent px-2 transition-all duration-200 focus:border-brand-blue-500 rounded border-transparent border appearance-none text-gray-800"
+        class="hover:border-gray-300 py-1 focus:bg-white bg-transparent px-2 transition-all duration-200 focus:border-brand-blue-500 rounded border-transparent border appearance-none text-gray-800"
       />
       <div class="flex flex-col ml-4">
-        <h1 class="font-medium text-xs mt-6 uppercase text-gray-600">
-          Who can access this deck?
+        <h1 class="font-medium text-xs mt-5 uppercase text-gray-600">
+          Deck Settings
         </h1>
-        <div class="flex items-center my-3 justify-between">
-          <h1 class="font-medium text-black is-danger" type="is-danger">
-            Everyone
-          </h1>
+        <div class="flex items-start my-3 justify-between">
+          <div class="flex flex-col pr-12">
+            <h1 class="font-medium text-black">
+              Public Deck
+            </h1>
+            <h1 class="text-sm">
+              By making this a public deck, it can be found in the deck library for anyone to join.
+            </h1>
+          </div>
           <VSwitch v-model="everyone" />
         </div>
         <div class="bg-gray-200 my-2" style="height: 1px"></div>
-        <div class="flex items-center my-3 justify-between">
-          <h1 class="font-medium text-black is-danger" type="is-danger">
-            Invite only
-          </h1>
-          <VSwitch v-model="inviteOnly" />
-        </div>
-        <div class="bg-gray-200" style="height: 1px"></div>
-        <div class="my-5"></div>
         <div class="flex items-start my-3 justify-between">
           <div class="flex flex-col pr-12">
             <h1 class="font-medium text-black">

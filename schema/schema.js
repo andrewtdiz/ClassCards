@@ -9,7 +9,7 @@ const HandReview = require('../models/handreview')
 const UserThumb = require('../models/userthumb')
 const DeckTag = require('../models/decktag')
 
-const { GraphQLObjectType, GraphQLString, GraphQLBoolean, GraphQLSchema, GraphQLID, GraphQLInt, GraphQLList } = graphql;
+const { GraphQLObjectType, GraphQLString, GraphQLBoolean, GraphQLSchema, GraphQLID, GraphQLInt, GraphQLList, GraphQLError } = graphql;
 
 const CardType = new GraphQLObjectType({
     name: 'Card',
@@ -215,8 +215,16 @@ const RootQuery = new GraphQLObjectType({
         },
         deck: {
             type: DeckType,
-            args: {id: {type: GraphQLString}},
+            args: {id: {type: GraphQLString}, userId: {type: GraphQLString}},
             resolve(parent, args) {
+                let deckHold = Deck.findById(args.id).then((res) => {
+                    if(!res.userIds.includes(args.userId)) {
+                        return new GraphQLError('Error !')
+                    }
+                }).catch(err => {
+                    return new GraphQLError('Error !')
+                }
+                    )
                 return Deck.findById(args.id)
             } 
         },
@@ -360,9 +368,9 @@ const Mutation = new GraphQLObjectType({
                     usersEdit: args.usersEdit,
                     anonymousPosting: args.anonymousPosting,
                 })
-                let hold = User.findOneAndUpdate({_id: args.userId}, {$push : {'deckIds' : deck.id}}, {new: true}).then((res) => {
+                let hold = User.findOneAndUpdate({_id: args.userId}, {$addToSet : {'deckIds' : deck.id}}, {new: true}).then((res) => {
                 }).then((res) => {
-                    let holdAdmin = Deck.findByIdAndUpdate(args.deckId, {$push : {'adminIds' : args.userId}}, {new: true})
+                    let holdAdmin = Deck.findByIdAndUpdate(args.deckId, {$addToSet : {'adminIds' : args.userId}}, {new: true})
                 })
                 return deck.save()
             }
@@ -431,7 +439,6 @@ const Mutation = new GraphQLObjectType({
                 parentTag: {type: GraphQLString}
             },
             resolve(parent,args) {
-                console.log('testing if defined', args.parentTag || undefined)
                 let decktag = new DeckTag({
                     name: args.name,
                     deckId: args.deckId,
@@ -439,7 +446,6 @@ const Mutation = new GraphQLObjectType({
                     dateCreated: new Date(),
                     parentTag: args.parentTag || ''
                 })
-                console.log(decktag)
                 return decktag.save()
             }
         },
@@ -470,7 +476,7 @@ const Mutation = new GraphQLObjectType({
             },
             resolve(parent,args) {
                 if(args.operation==1) {
-                    return Deck.findByIdAndUpdate(args.deckId, {$push : {'adminIds' : args.userId}}, {new: true})
+                    return Deck.findByIdAndUpdate(args.deckId, {$addToSet : {'adminIds' : args.userId}}, {new: true})
                 }
                 return Deck.findByIdAndUpdate(args.deckId, {$pull : {'adminIds' : args.userId}}, {new: true})
             }
@@ -483,10 +489,9 @@ const Mutation = new GraphQLObjectType({
                 operation: {type: GraphQLInt}
             },
             resolve(parent,args) {
-                let hold = Hand.findOneAndUpdate({_id: args.handId}, {$inc : {'likeTotal' : args.operation}}, {new: true}).then((res) => {
-                })
+                let hold = Hand.findOneAndUpdate({_id: args.handId}, {$inc : {'likeTotal' : args.operation}}, {new: true}).exec()
                 if(args.operation==1) {
-                    return User.findByIdAndUpdate(args.userId, {$push : {'likedHands' : args.handId}}, {new: true})
+                    return User.findByIdAndUpdate(args.userId, {$addToSet : {'likedHands' : args.handId}}, {new: true})
                 } 
                 return User.findByIdAndUpdate(args.userId, {$pull : {'likedHands' : args.handId}}, {new: true})          
             }
@@ -500,10 +505,10 @@ const Mutation = new GraphQLObjectType({
             },
             resolve(parent,args) {
                 if(args.operation==1) {
-                    let hold = Deck.findByIdAndUpdate(args.deckId, {$push : {'userIds' : args.userId}})
-                    return User.findByIdAndUpdate(args.userId, {$push : {'deckIds' : args.deckId}}, {new: true})
+                    let hold = Deck.findByIdAndUpdate(args.deckId, {$addToSet : {'userIds' : args.userId}}).exec()
+                    return User.findByIdAndUpdate(args.userId, {$addToSet : {'deckIds' : args.deckId}}, {new: true})
                 } 
-                let hold = Deck.findByIdAndUpdate(args.deckId, {$pull : {'userIds' : args.userId}})
+                let hold = Deck.findByIdAndUpdate(args.deckId, {$pull : {'userIds' : args.userId}}).exec()
                 return User.findByIdAndUpdate(args.userId, {$pull : {'deckIds' : args.deckId}}, {new: true})
                 
             }

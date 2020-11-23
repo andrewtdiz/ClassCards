@@ -32,6 +32,7 @@ export default new Vuex.Store({
     handsPulled: false,
     viewingHand: "",
     viewingModal: "",
+    contentLoaded: false,
   },
   getters: {
     getUsers(state) { return state.users },
@@ -43,11 +44,15 @@ export default new Vuex.Store({
       return state.hands
     },
     getViewingHand(state) { return state.viewingHand },
-    getViewingModal(state) { return state.viewingModal }
+    getViewingModal(state) { return state.viewingModal },
+    getContentLoaded(state) { return state.contentLoaded }
   },
   mutations: {
     changeModal(state, val) {
       state.viewingModal = val
+    },
+    setContentLoaded(state, val) {
+      state.contentLoaded = val
     }
   },
   actions: {
@@ -59,7 +64,6 @@ export default new Vuex.Store({
       })
     },
     async getDecks({state}) {
-      console.log('getting decks')
       var temp = await graphQL.performOperation(getDecks).then((res) => {
         res.data.data.decks.forEach(val => {
           if(!state.decks.map(deck=>deck.id).includes(val.id)) state.decks.push(val)
@@ -91,7 +95,7 @@ export default new Vuex.Store({
       });
     },
     async changeDeck({state, dispatch}, {id}) {
-      var temp = await graphQL.performOperation(getDeckByID, {id}).then((res) => {
+      var temp = await graphQL.performOperation(getDeckByID, {id, userId: state.currentUser.id}).then((res) => {
         state.currentDeck = res.data.data.deck
       })
     },
@@ -103,7 +107,6 @@ export default new Vuex.Store({
       state.viewingHand= 'loading'
       var temp = await graphQL.performOperation(getHandById, {handId, userId: state.currentUser.id}).then((res) => {
         let hand = res.data.data.hand
-        console.log('found it', state.currentUser)
         for(let i=0; i<state.currentUser.userThumbs.length;i++) {
           if(state.currentUser.userThumbs[i].handId==handId) {
             hand.userThumb = state.currentUser.userThumbs[i].cardId
@@ -148,10 +151,8 @@ export default new Vuex.Store({
         parentTag: parentTag || undefined,
         handIdsOrder: handIdsOrder,
       }).then((res) => {
-        console.log('got the data: ', res.data.data.editDeckTag)
         for(let i=0; i<state.currentDeck.tags.length;i++) {
           if(state.currentDeck.tags[i].id==id) {
-            console.log('overriding data', res.data.data.editDeckTag)
             state.currentDeck.tags.splice(i,1, res.data.data.editDeckTag)
           }
         }
@@ -161,7 +162,6 @@ export default new Vuex.Store({
       var temp = await graphQL
         .performOperation(addDeck, { deckName, deckDescription, userId: state.currentUser.id, everyone, inviteOnly, usersEdit, anonymousPosting })
         .then((res) => {
-          console.log(res.data.data)
           state.decks.push(res.data.data.addDeck)
           let holdId = state.currentUser.id
           dispatch('changeUser', {id: holdId})
@@ -253,14 +253,12 @@ export default new Vuex.Store({
         })
     },
     async addDeckTag({state}, {name, parentTag}) {
-      console.log('deck tag', name)
       var temp = await graphQL.performOperation(addDeckTag, {
         name,
         deckId: state.currentDeck.id,
         parentTag: parentTag || ''
       })
       .then((res) => {
-       console.log('successfully pulled deck', res.data.data.addDeckTag)
        state.currentDeck.tags.push(res.data.data.addDeckTag)
       })
     },
@@ -273,9 +271,7 @@ export default new Vuex.Store({
           cardId: id,
           operation: -1
         }).then(() => {
-          console.log(state.hands[0])
           Vue.set(state.hands[state.hands.map(hand=>hand.id).indexOf(state.viewingHand)], 'userThumb', undefined)
-          console.log(state.hands[0])
           for(let i=0; i<state.currentUser.userThumbs.length;i++) {
             if(state.currentUser.userThumbs[i].handId==state.viewingHand) {
               state.currentUser.userThumbs.splice(i, 1)
