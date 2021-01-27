@@ -7,6 +7,7 @@ const schema = require('./schema/schema')
 const Card = require('./models/card')
 const mongoose = require('mongoose')
 var cors = require('cors')
+require('dotenv').config()
 
 mongoose.set('useFindAndModify', false);
 
@@ -25,7 +26,7 @@ app.use('/graphql', graphqlHTTP({
 }))
 
 
-mongoose.connect('mongodb+srv://andrew:2lxRE8UrhkpSmhAh@cluster0.2pshv.gcp.mongodb.net/app?retryWrites=true&w=majority'
+mongoose.connect(process.env.DB_HOST
 , {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
     app.listen(3000)
 }).then((err)=> console.log('server running on 3000')).catch((err) => {
