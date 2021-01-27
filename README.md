@@ -1,6 +1,15 @@
 # real-appeal
 
 ## Project setup
+
+### Server setup
+1. Update .env file to contain a reference to a MongoDB instance
+2. Run the code below to begin the server:
+```
+nodemon app.js
+```
+
+### Client setup
 ```
 npm install
 ```
@@ -14,6 +23,3 @@ npm run serve
 ```
 npm run build
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
