@@ -3,7 +3,7 @@
 ## Project setup
 
 ### Server setup
-1. Update .env file to contain a reference to a MongoDB instance
+1. Add .env file to contain a reference to a MongoDB instance
 2. Run the code below to begin the server:
 ```
 nodemon app.js
